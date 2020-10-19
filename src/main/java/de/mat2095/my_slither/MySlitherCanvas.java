@@ -3,6 +3,7 @@ package de.mat2095.my_slither;
 import static de.mat2095.my_slither.MySlitherModel.PI2;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
@@ -38,11 +39,12 @@ final class MySlitherCanvas extends JPanel {
     private static final Font NAME_FONT = Font.decode("SansSerif-BOLD");
     private static final Font DEBUG_FONT = Font.decode("SansSerif-PLAIN-12");
 
+    private Boolean boostAllowed = true;
     private boolean[] map;
     private final MySlitherJFrame view;
     private int zoom = 12;
     private long lastFrameTime;
-    private double fps;
+    private double fps; //frames per second
     final ScheduledExecutorService repaintThread;
 
     final MouseInput mouseInput = new MouseInput();
@@ -96,12 +98,12 @@ final class MySlitherCanvas extends JPanel {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                mouseInput.boost = true;
+                boostOn();
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                mouseInput.boost = false;
+                boostOff();
             }
 
             @Override
@@ -120,6 +122,43 @@ final class MySlitherCanvas extends JPanel {
         long repaintDelay = 1000000000 / (refreshRate != DisplayMode.REFRESH_RATE_UNKNOWN ? refreshRate : 60);
         repaintThread = Executors.newSingleThreadScheduledExecutor();
         repaintThread.scheduleAtFixedRate(this::repaint, 1, repaintDelay, TimeUnit.NANOSECONDS);
+    }
+
+    public static ActionListener boostDepletedListener = new ActionListener() {
+        public void boostDepleted(ActionEvent e) {
+            Object obj = e.getSource();
+            obj.boostOff();
+        }
+    };
+
+    public static ActionListener cooldownDepletedListener = new ActionListener(){
+        public void cooldownDepleted(ActionEvent e) {
+            Object obj = e.getSource();
+            obj.setBoostAllowed(true);
+        }
+    };
+
+
+    public void boostOn(){
+        //turns boost on & then automatically turns it off after 20 seconds
+        mouseInput.boost = true;
+        Timer t = new Timer(20000, boostDepletedListener);
+        t.setRepeats(false);
+        t.start();
+    }
+
+    public void boostOff(){
+        //turns boost off & then gives buffer period of 10 seconds before boosting is allowed again
+        mouseInput.boost = false;
+        setBoostAllowed(false);
+        //THEN start timer
+        Timer t = new Timer(10000,cooldownDepletedListener);
+        t.setRepeats(false);
+        t.start();
+    }
+
+    public void setBoostAllowed(Boolean input){
+        boostAllowed=input;
     }
 
     void setMap(boolean[] map) {
