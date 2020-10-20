@@ -4,9 +4,9 @@ import static de.mat2095.my_slither.MySlitherModel.PI2;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
+//import java.awt.event.MouseAdapter;
+//import java.awt.event.MouseEvent;
+//import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Path2D;
@@ -98,7 +98,9 @@ final class MySlitherCanvas extends JPanel {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
+                if(boostAllowed){
                 boostOn();
+                }
             }
 
             @Override
@@ -124,25 +126,15 @@ final class MySlitherCanvas extends JPanel {
         repaintThread.scheduleAtFixedRate(this::repaint, 1, repaintDelay, TimeUnit.NANOSECONDS);
     }
 
-    public static ActionListener boostDepletedListener = new ActionListener() {
-        public void boostDepleted(ActionEvent e) {
-            Object obj = e.getSource();
-            obj.boostOff();
-        }
-    };
-
-    public static ActionListener cooldownDepletedListener = new ActionListener(){
-        public void cooldownDepleted(ActionEvent e) {
-            Object obj = e.getSource();
-            obj.setBoostAllowed(true);
-        }
-    };
-
-
     public void boostOn(){
         //turns boost on & then automatically turns it off after 20 seconds
         mouseInput.boost = true;
-        Timer t = new Timer(20000, boostDepletedListener);
+        Timer t = new Timer(20000, new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+                boostOff();
+            }
+        });
         t.setRepeats(false);
         t.start();
     }
@@ -151,8 +143,12 @@ final class MySlitherCanvas extends JPanel {
         //turns boost off & then gives buffer period of 10 seconds before boosting is allowed again
         mouseInput.boost = false;
         setBoostAllowed(false);
-        //THEN start timer
-        Timer t = new Timer(10000,cooldownDepletedListener);
+        Timer t = new Timer(10000,new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+                setBoostAllowed(true);
+            }
+        });
         t.setRepeats(false);
         t.start();
     }
