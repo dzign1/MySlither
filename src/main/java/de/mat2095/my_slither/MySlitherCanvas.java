@@ -4,9 +4,6 @@ import static de.mat2095.my_slither.MySlitherModel.PI2;
 
 import java.awt.*;
 import java.awt.event.*;
-//import java.awt.event.MouseAdapter;
-//import java.awt.event.MouseEvent;
-//import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Path2D;
@@ -165,7 +162,7 @@ final class MySlitherCanvas extends JPanel {
     protected void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
 
-        if (!(graphics instanceof Graphics2D)) {
+        if (!(graphics instanceof Graphics2D)) { //if graphics is not of type Graphics2d, exit the function
             return;
         }
 
