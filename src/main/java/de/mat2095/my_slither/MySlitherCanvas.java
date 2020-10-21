@@ -30,8 +30,8 @@ final class MySlitherCanvas extends JPanel {
     private static final float[] SNAKE_HALO_FRACTIONS = new float[]{0.5f, 1f};
     private static final Color[] SNAKE_HALO_COLORS = new Color[]{new Color(0x60287BDE, true), new Color(0x00287BDE, true)};
     private static final Color[] OWN_SNAKE_HALO_COLORS = new Color[]{new Color(0x6039AFFF, true), new Color(0x0039AFFF, true)};
-    private static final Color SNAKE_BODY_COLOR = new Color(0x6A8759);
-    private static final Color OWN_SNAKE_BODY_COLOR = new Color(0xA5C261);
+    private static final Color SNAKE_BODY_COLOR = new Color(0x6A8759); // Other Snake Body Colour
+    private static final Color OWN_SNAKE_BODY_COLOR = new Color(0xA5C261); //Player Snake Body Colour DEFAULT
     private static final Color MAP_COLOR = new Color(0xA0A9B7C6, true);
     private static final Color MAP_POSITION_COLOR = new Color(0xE09E2927, true);
     private static final Color NAME_SHADOW_COLOR = new Color(0xC02B2B2B, true);
@@ -43,6 +43,7 @@ final class MySlitherCanvas extends JPanel {
     private int zoom = 12;
     private long lastFrameTime;
     private double fps;
+    private Color clientSnakeCol;
     final ScheduledExecutorService repaintThread;
 
     final MouseInput mouseInput = new MouseInput();
@@ -126,6 +127,45 @@ final class MySlitherCanvas extends JPanel {
         this.map = map;
     }
 
+    public void setSnakeColor(MySlitherJFrame frame) {
+        String col = frame.getOwnSnakeCol().substring(0, 2);
+        switch(col){
+            case "00":
+                this.clientSnakeCol = new Color(0x800080);
+                break;
+            case "01":
+                this.clientSnakeCol = new Color(0x0000FF);
+                break;
+            case "02":
+                this.clientSnakeCol = new Color(0x00FFFF);
+                break;
+            case "03":
+                this.clientSnakeCol = new Color(0x00FF00);
+                break;
+            case "04":
+                this.clientSnakeCol = new Color(0xFFFF00);
+                break;
+            case "05":
+                this.clientSnakeCol = new Color(0xFFA500);
+                break;
+            case "06":
+                this.clientSnakeCol = new Color(0xFA8072);
+                break;
+            case "07":
+                this.clientSnakeCol = new Color(0xFF0000);
+                break;
+            case "08":
+                this.clientSnakeCol = new Color(0xEE82EE);
+                break;
+            case "19":
+                this.clientSnakeCol = new Color(0xFFFFFF);
+                break;
+            default:
+                this.clientSnakeCol = new Color(0xA5C261);
+                break;
+        } 
+    }
+
     @Override
     protected void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
@@ -198,7 +238,7 @@ final class MySlitherCanvas extends JPanel {
             model.snakes.values().forEach(snake -> {
                 double thickness = 16 + snake.body.size() / 4.0;
                 if (snake.body.size() >= 2) {
-                    g.setColor(snake == model.snake ? OWN_SNAKE_BODY_COLOR : SNAKE_BODY_COLOR);
+                    g.setColor(snake == model.snake ? clientSnakeCol : SNAKE_BODY_COLOR); //Sets client model snake to own snake colour or other client snake model to other snake colour
                     g.setStroke(new BasicStroke((float) thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
                     double totalLength = 0; // TODO: respect FAM, ???

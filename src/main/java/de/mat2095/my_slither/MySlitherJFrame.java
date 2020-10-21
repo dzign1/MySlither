@@ -129,6 +129,7 @@ final class MySlitherJFrame extends JFrame {
         getContentPane().setLayout(new BorderLayout());
 
         canvas = new MySlitherCanvas(this);
+        canvas.setSnakeColor(this);
         player = canvas.mouseInput;
 
         // === upper row ===
@@ -140,6 +141,9 @@ final class MySlitherJFrame extends JFrame {
 
         snake = new JComboBox<>(SNAKES);
         snake.setMaximumRowCount(snake.getItemCount());
+        snake.addActionListener(a -> {
+            canvas.setSnakeColor(this);
+        });
 
         useRandomServer = new JCheckBox("use random server", true);
         useRandomServer.addActionListener(a -> {
@@ -428,6 +432,10 @@ final class MySlitherJFrame extends JFrame {
     void setHighscoreData(int row, String name, int length, boolean highlighted) {
         highscoreList.setValueAt(highlighted ? "<html><b>" + length + "</b></html>" : length, row, 0);
         highscoreList.setValueAt(highlighted ? "<html><b>" + name + "</b></html>" : name, row, 1);
+    }
+
+    public String getOwnSnakeCol() {
+        return snake.getSelectedItem().toString();
     }
 
     private enum Status {
