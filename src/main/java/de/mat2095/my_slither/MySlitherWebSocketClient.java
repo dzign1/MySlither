@@ -107,6 +107,7 @@ final class MySlitherWebSocketClient extends WebSocketClient {
             data[i] = b[i] & 0xFF;
         }
         char cmd = (char) data[2];
+        view.setCooldown();
         switch (cmd) {
             case '6':
                 processPreInitResponse(data);

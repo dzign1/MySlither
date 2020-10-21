@@ -43,6 +43,7 @@ final class MySlitherCanvas extends JPanel {
     private long lastFrameTime;
     private double fps; //frames per second
     final ScheduledExecutorService repaintThread;
+    private long cooldownEpoch; // the time the boost was most recently deactivated, used for calculating cooldown
 
     final MouseInput mouseInput = new MouseInput();
 
@@ -140,6 +141,7 @@ final class MySlitherCanvas extends JPanel {
         //turns boost off & then gives buffer period of 10 seconds before boosting is allowed again
         mouseInput.boost = false;
         setBoostAllowed(false);
+        cooldownEpoch = System.currentTimeMillis();
         Timer t = new Timer(10000,new ActionListener(){
             public void actionPerformed(ActionEvent e)
             {
@@ -148,6 +150,12 @@ final class MySlitherCanvas extends JPanel {
         });
         t.setRepeats(false);
         t.start();
+    }
+
+    public String getCooldown() {
+        long cooldown =10 - (System.currentTimeMillis() - cooldownEpoch)/1000;
+        cooldown = cooldown < 0 ? 0 : cooldown; // if cooldown is negative, set it to zero
+        return String.format("%d", cooldown);
     }
 
     public void setBoostAllowed(Boolean input){
