@@ -129,7 +129,6 @@ final class MySlitherJFrame extends JFrame {
         getContentPane().setLayout(new BorderLayout());
 
         canvas = new MySlitherCanvas(this);
-        canvas.setSnakeColor(this);
         player = canvas.mouseInput;
 
         // === upper row ===
@@ -141,6 +140,7 @@ final class MySlitherJFrame extends JFrame {
 
         snake = new JComboBox<>(SNAKES);
         snake.setMaximumRowCount(snake.getItemCount());
+        canvas.setSnakeColor(this);
         snake.addActionListener(a -> {
             canvas.setSnakeColor(this);
         });
@@ -154,6 +154,7 @@ final class MySlitherJFrame extends JFrame {
         connect.addActionListener(a -> {
             switch (status) {
                 case DISCONNECTED:
+                
                     connect();
                     break;
                 case CONNECTING:
