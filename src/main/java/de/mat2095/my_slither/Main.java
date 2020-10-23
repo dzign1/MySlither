@@ -4,7 +4,10 @@ import javax.swing.*;
 
 
 public final class Main {
-
+    /**
+     * Starter function that indirectly creates the UI
+     * @param  args Texted passed from the command line
+     */
     public static void main(String[] args) {
 
         System.setProperty("sun.java2d.opengl", "true");

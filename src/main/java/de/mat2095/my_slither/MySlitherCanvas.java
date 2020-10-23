@@ -15,13 +15,33 @@ import javax.swing.*;
 
 
 final class MySlitherCanvas extends JPanel {
-
+    /**
+     * The background colour of the game
+     */
     private static final Color BACKGROUND_COLOR = new Color(0x2B2B2B);
+    /**
+     * The foreground colour of the game
+     */
     private static final Color FOREGROUND_COLOR = new Color(0xA9B7C6);
+    /**
+     * The sector colour in game
+     */
     private static final Color SECTOR_COLOR = new Color(0x803C3F41, true);
+    /**
+     * The colour of the food in game
+     */
     private static final Color FOOD_COLOR = new Color(0xCC7832);
+    /**
+     * The colour of the AI controlled prey in game
+     */
     private static final Color PREY_COLOR = new Color(0xFFFF00);
+    /**
+     * TexturePaint param when drawing the prey
+     */
     private static final float[] PREY_HALO_FRACTIONS = new float[]{0.5f, 1f};
+    /**
+     * Description of the variable here.
+     */
     private static final Color[] PREY_HALO_COLORS = new Color[]{new Color(0x60FFFF00, true), new Color(0x00FFFF00, true)};
     private static final Color SNAKE_COLOR = new Color(0x287BDE);
     private static final Color OWN_SNAKE_COLOR = new Color(0x39AFFF);
