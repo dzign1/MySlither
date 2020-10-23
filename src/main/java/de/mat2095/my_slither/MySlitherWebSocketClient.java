@@ -444,6 +444,8 @@ final class MySlitherWebSocketClient extends WebSocketClient {
         switch (deathReason) {
             case 0:
                 view.log("You died.");
+                GameSounds.deathSound();
+                view.log("death sound play!!");
                 break;
             case 1:
                 view.log("You've achieved a new record!");
@@ -585,6 +587,7 @@ final class MySlitherWebSocketClient extends WebSocketClient {
             view.log("add food wrong length!");
             return;
         }
+        GameSounds.eatFood();
         for (int i = 8; i < data.length; i += 6) {
             int x = (data[i - 4] << 8) | data[i - 3];
             int z = (data[i - 2] << 8) | data[i - 1];
