@@ -12,8 +12,10 @@ public class GameSounds {
     {
         try
         {
+            //File pathway for the selected file
             File deathSound = new File("src/main/java/de/mat2095/Sounds/DeathSound.wav");
-            System.out.println(deathSound.getAbsolutePath()+deathSound.getCanonicalPath());
+
+            //Create Audio input stream for
             AudioInputStream as = AudioSystem.getAudioInputStream(deathSound);
             Clip clip = AudioSystem.getClip();
             clip.open(as);
@@ -27,32 +29,28 @@ public class GameSounds {
         }
     }
     /**
-     * Sound for when the player's slither eats good food
+     * Sound for when the player's slither eats food
      */
     public static void eatFood()
     {
+
         try
         {
-            try
-            {
-                File deathSound = new File("src/main/java/de/mat2095/Sounds/FoodSound.wav");
-                System.out.println(deathSound.getAbsolutePath()+deathSound.getCanonicalPath());
-                AudioInputStream as = AudioSystem.getAudioInputStream(deathSound);
-                Clip clip = AudioSystem.getClip();
-                clip.open(as);
-                clip.start();
+            //File pathway for the selected file
+            File deathSound = new File("src/main/java/de/mat2095/Sounds/FoodSound.wav");
+
+            AudioInputStream as = AudioSystem.getAudioInputStream(deathSound);
+            Clip clip = AudioSystem.getClip();
+            clip.open(as);
+            clip.start();
 
 
-            }
-            catch(Exception e)
-            {
-                e.printStackTrace();
-            }
         }
         catch(Exception e)
         {
             e.printStackTrace();
         }
+
     }
 
 
