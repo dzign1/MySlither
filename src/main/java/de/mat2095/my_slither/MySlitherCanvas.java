@@ -3,9 +3,7 @@ package de.mat2095.my_slither;
 import static de.mat2095.my_slither.MySlitherModel.PI2;
 
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Path2D;
@@ -17,34 +15,117 @@ import javax.swing.*;
 
 
 final class MySlitherCanvas extends JPanel {
-
+    /**
+     * The background colour of the game
+     */
     private static final Color BACKGROUND_COLOR = new Color(0x2B2B2B);
+    /**
+     * The foreground colour of the game
+     */
     private static final Color FOREGROUND_COLOR = new Color(0xA9B7C6);
+    /**
+     * The sector colour in game
+     */
     private static final Color SECTOR_COLOR = new Color(0x803C3F41, true);
+    /**
+     * The colour of the food in game
+     */
     private static final Color FOOD_COLOR = new Color(0xCC7832);
+    /**
+     * The colour of the AI controlled prey in game
+     */
     private static final Color PREY_COLOR = new Color(0xFFFF00);
+    /**
+     * TexturePaint param when drawing the prey
+     */
     private static final float[] PREY_HALO_FRACTIONS = new float[]{0.5f, 1f};
+    /**
+     * The colour of the prey halos
+     */
     private static final Color[] PREY_HALO_COLORS = new Color[]{new Color(0x60FFFF00, true), new Color(0x00FFFF00, true)};
+    /**
+     * The colour of all the snakes in the game
+     */
     private static final Color SNAKE_COLOR = new Color(0x287BDE);
+    /**
+     * The colour of the player's snake
+     */
     private static final Color OWN_SNAKE_COLOR = new Color(0x39AFFF);
+    /**
+     * The TexturePaint param. when drawing general snakes
+     */
     private static final float[] SNAKE_HALO_FRACTIONS = new float[]{0.5f, 1f};
+    /**
+     * The colour of the snake halos
+     */
     private static final Color[] SNAKE_HALO_COLORS = new Color[]{new Color(0x60287BDE, true), new Color(0x00287BDE, true)};
+    /**
+     * The colour of the player's halo.
+     */
     private static final Color[] OWN_SNAKE_HALO_COLORS = new Color[]{new Color(0x6039AFFF, true), new Color(0x0039AFFF, true)};
+    /**
+     * The colour of the snake body parts
+     */
     private static final Color SNAKE_BODY_COLOR = new Color(0x6A8759);
+    /**
+     * The colour of the player's body parts.
+     */
     private static final Color OWN_SNAKE_BODY_COLOR = new Color(0xA5C261);
+    /**
+     * The colour used for the map
+     */
     private static final Color MAP_COLOR = new Color(0xA0A9B7C6, true);
+    /**
+     * The colour of the icon showing positioning on the map.
+     */
     private static final Color MAP_POSITION_COLOR = new Color(0xE09E2927, true);
+    /**
+     * The colour of player's names.
+     */
     private static final Color NAME_SHADOW_COLOR = new Color(0xC02B2B2B, true);
+    /**
+     * Front to be used for the names in game
+     */
     private static final Font NAME_FONT = Font.decode("SansSerif-BOLD");
+    /**
+     * Font to be used in the debugging menu in game
+     */
     private static final Font DEBUG_FONT = Font.decode("SansSerif-PLAIN-12");
-
+    /**
+     * Allows/disallows players from using the boost
+     */
+    private Boolean boostAllowed = true;
+    /**
+     * Stores the state of the maps
+     */
     private boolean[] map;
+    /**
+     * The JFrame that allows the player to see the game
+     */
     private final MySlitherJFrame view;
+    /**
+     * Zoom level in game, controls how much the player can see.
+     */
     private int zoom = 12;
+    /**
+     * The time that the last frame was recieved
+     */
     private long lastFrameTime;
+    /**
+     * Frames Per Second
+     */
     private double fps;
+    /**
+     * Controls how often the screen is redrawn
+     */
     final ScheduledExecutorService repaintThread;
-
+    /**
+     * The time the boost was most recently deactivated, used for calculating cooldown
+     */
+    private long cooldownEpoch;
+    /**
+     * Most recent mouse input
+     */
     final MouseInput mouseInput = new MouseInput();
 
     class MouseInput extends Player {
@@ -96,12 +177,14 @@ final class MySlitherCanvas extends JPanel {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                mouseInput.boost = true;
+                if(boostAllowed){
+                boostOn();
+                }
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                mouseInput.boost = false;
+                boostOff();
             }
 
             @Override
@@ -122,6 +205,44 @@ final class MySlitherCanvas extends JPanel {
         repaintThread.scheduleAtFixedRate(this::repaint, 1, repaintDelay, TimeUnit.NANOSECONDS);
     }
 
+    public void boostOn(){
+        //turns boost on & then automatically turns it off after 20 seconds
+        mouseInput.boost = true;
+        Timer t = new Timer(20000, new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+                boostOff();
+            }
+        });
+        t.setRepeats(false);
+        t.start();
+    }
+
+    public void boostOff(){
+        //turns boost off & then gives buffer period of 10 seconds before boosting is allowed again
+        mouseInput.boost = false;
+        setBoostAllowed(false);
+        cooldownEpoch = System.currentTimeMillis();
+        Timer t = new Timer(10000,new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+                setBoostAllowed(true);
+            }
+        });
+        t.setRepeats(false);
+        t.start();
+    }
+
+    public String getCooldown() {
+        long cooldown =10 - (System.currentTimeMillis() - cooldownEpoch)/1000;
+        cooldown = cooldown < 0 ? 0 : cooldown; // if cooldown is negative, set it to zero
+        return String.format("%d", cooldown);
+    }
+
+    public void setBoostAllowed(Boolean input){
+        boostAllowed=input;
+    }
+
     void setMap(boolean[] map) {
         this.map = map;
     }
@@ -130,7 +251,7 @@ final class MySlitherCanvas extends JPanel {
     protected void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
 
-        if (!(graphics instanceof Graphics2D)) {
+        if (!(graphics instanceof Graphics2D)) { //if graphics is not of type Graphics2d, exit the function
             return;
         }
 
